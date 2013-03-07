@@ -1,0 +1,165 @@
+<html>
+<head>
+   <title> Testing Grid </title>
+   <script type="text/javascript" src="http://mbostock.github.com/d3/d3.v2.js"></script>
+   <script>
+   var svgContent;
+   var spacing = 40;
+   var width=1200;
+   var height=600;
+   var useNormalGrid = false;
+
+   // Create a SVG container with mouse move handler
+   function init() {
+      svgContent = d3.select("#contentD3")
+         .append("svg")
+         .attr("width", width)
+         .attr("height", height)
+         .attr("id", "content")
+         .style("background-color", "#BABABA")
+         .on("mousemove", function(d) {
+            if ( useNormalGrid == false) {
+               var pos = d3.mouse(this);
+               drawLine( pos );
+               drawLabel( pos );
+            }
+         })
+      ;
+
+      createRandomCircle();
+
+      // Create a key listener
+      d3.select(window).on("keydown", function(d) {
+         //console.log( d3.event );
+         if ( d3.event.keyCode == 65) { // A
+            console.log("Switch");
+            useNormalGrid = !useNormalGrid;
+            if (useNormalGrid == true) {
+               drawNormalGrid();
+            }
+         }
+      });
+   }
+
+   function drawNormalGrid() {
+      d3.selectAll("#gLine").remove();
+      d3.selectAll("#gLabel").remove();
+      for (var i=0; i <= width; i+= spacing) {
+         drawLineHelper( i, -2000, i, 2000);
+
+         svgContent.append("text")
+            .attr("id", "gLabel")
+            .style("font", "bold 11px Arial")
+            .attr("x", i)
+            .attr("y", 10)
+            .style("opacity", 0.8)
+            .text( i )
+         ;
+      }
+      for (var i=0; i <= height; i+= spacing) {
+         drawLineHelper( 2000, i, -2000, i);
+         svgContent.append("text")
+            .attr("id", "gLabel")
+            .style("font", "bold 11px Arial")
+            .attr("x", width-20)
+            .attr("y", i)
+            .style("opacity", 0.8)
+            .text( i )
+         ;
+      }
+
+   }
+
+   function createRandomCircle() {
+      for (var i=0; i < 10; i++) {
+         var x = Math.random()*width;
+         var y = Math.random()*height;
+         svgContent.append("svg:circle")
+            .attr("cx", x)
+            .attr("cy", y)
+            .attr("r", 12)
+            .style("fill", "#FFFF00")
+            .style("stroke", "#AAAAAA")
+            .style("stroke-width", 2)
+         ;
+      }
+   }
+
+   function drawLine( c ) {
+      d3.selectAll("#gLine").remove();
+
+      drawLineHelper( c[0]-2000, c[1], c[0]+2000, c[1] );
+      drawLineHelper( c[0], c[1]-2000, c[0], c[1]+2000 );
+
+
+      // Local grid
+      for (var i=-4; i <= 4; i++) {
+         var d=c;
+         drawLineHelper( d[0]+spacing*i, d[1]-200, d[0]+spacing*i, d[1]+200, "#000000" );
+      }
+      for (var i=-4; i <= 4; i++) {
+         var d=c;
+         drawLineHelper( c[0]-200, c[1]+spacing*i, c[0]+200, c[1]+spacing*i, "#000000" );
+      }
+   }
+
+   function drawLineHelper(x1, y1, x2, y2, col) {
+      svgContent.append("svg:line")
+         .attr("x1", x1)
+         .attr("y1", y1)
+         .attr("x2", x2)
+         .attr("y2", y2)
+         .attr("id", "gLine")
+         .style("stroke", col?col:"#000000")
+         .style("opacity", 0.4)
+      ;
+   }
+
+   function drawLabel( c ) {
+      d3.selectAll("#gLabel").remove();
+
+      /*
+      svgContent.append("text")
+         .attr("id", "gLabel")
+         .style("font", "bold 12px Arial")
+         .attr("x", c[0])
+         .attr("y", c[1])
+         .text( "(" + c[0] + "," + c[1] + ")")
+      ;   
+      */
+
+      for (var i=-4; i <= 4; i++) {
+         svgContent.append("text")
+            .attr("id", "gLabel")
+            .style("font", "bold 11px Arial")
+            .attr("x", c[0] > (width/2)?c[0]-200:c[0]+200)
+            .attr("y", c[1]+i*spacing+4)
+            .style("opacity", 0.8)
+            .text( c[1]+i*spacing )
+         ;   
+         svgContent.append("text")
+            .attr("id", "gLabel")
+            .style("font", "bold 11px Arial")
+            .attr("x", c[0]+i*spacing-9)
+            .attr("y", c[1] > (height/2)?c[1]-200:c[1]+200)
+            .style("opacity", 0.8)
+            .text( c[0]+i*spacing )
+         ;   
+
+
+
+      }
+
+   }
+
+
+
+   </script>
+</head>
+<body>
+   <div id="contentD3"></div>
+   <script>
+   init();
+   </script>
+</body>
+</html>
