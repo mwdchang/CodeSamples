@@ -1,1 +1,1 @@
-Javascript/HTML Snippets
+javascript/HTML Snippets
